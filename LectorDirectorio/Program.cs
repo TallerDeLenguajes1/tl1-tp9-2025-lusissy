@@ -13,7 +13,7 @@ do
         break;
     }else
     {
-        Console.WriteLine("El path ingresado es invalido. intente Nuevamente:");
+        Console.WriteLine("El path ingresado es invalido. Intente Nuevamente:");
     }
 
 } while (!Directory.Exists(pathIngresado));
