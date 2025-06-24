@@ -1,33 +1,75 @@
 ﻿// See https://aka.ms/new-console-template for more information
+string path = "";
+
+        do
+        {
+            Console.WriteLine("Ingrese la ruta de la carpeta a analizar:");
+            path = Console.ReadLine();
+        } while (string.IsNullOrEmpty(path) || string.IsNullOrWhiteSpace(path));
+
+        if (Directory.Exists(path))
+        {
+            var directories = Directory.GetDirectories(path);
+            var files = Directory.GetFiles(path);
+
+            if (directories.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                Console.WriteLine($"Listados de directorios en {path}");
+                Console.ResetColor();
+                foreach (var directory in directories)
+                {
+                    var nameDirectory = Path.GetFileName(directory);
+                    Console.WriteLine(nameDirectory);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"El directorio {path} no contiene subdirectorios");
+            }
+
+            Console.WriteLine();
+            if (files.Length > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine($"Listados de archivos en {path}");
+                Console.ResetColor();
+                foreach (var pathFile in files)
+                {
+                    var nameFile = Path.GetFileName(pathFile);
+                    var info = new FileInfo(pathFile);
+                    var length = info.Length / 1024.0;
+                    Console.WriteLine($" {nameFile} - Tamaño {info.Length / 1024} KB ");
+                }
+
+                string path_file = "reporte_archivos.csv";
+
+                string path_reporte = Path.Combine(path, path_file);
 
 
-Console.WriteLine("Ingrese el path del directorio que desea analizar: ");
-string? pathIngresado;
-string[] directorio,archivos;
+                using (var stream = new StreamWriter(path_reporte))
+                {
+                    stream.WriteLine($"Archivo,Tamaño en KB,Fecha de ultima modificación");
+                    foreach (var item in files)
+                    {
+                        string nombre = Path.GetFileName(item);
+                        var info = new FileInfo(item);
+                        var length = info.Length / 1024.0;
+                        var date = info.LastWriteTime;
+                        stream.WriteLine($"{nombre},{length},{date}");
+                    }
+                }
 
-do
-{
-    pathIngresado=Console.ReadLine();
-    if (Directory.Exists(pathIngresado))
-    {
-        break;
-    }else
-    {
-        Console.WriteLine("El path ingresado es invalido. Intente Nuevamente:");
-    }
+            }
+            else
+            {
+                Console.WriteLine($"El directorio {path} no contiene archivos");
+            }
 
-} while (!Directory.Exists(pathIngresado));
+        }
+        else
+        {
+            Console.WriteLine($"No se encontro el directorio: {path}");
+        }
 
-Console.WriteLine("Carpetas encontradas:");
-directorio=Directory.GetDirectories(pathIngresado);
-foreach (var carpeta in directorio)
-{
-    archivos=Directory.GetFiles(carpeta);
-    Console.WriteLine($"Archivos de la carpeta{carpeta}");
-    foreach (var archivo in archivos)
-    {
-        var aux= new FileInfo(archivo);
-        long tamanio= aux.Length/1024;
-        System.Console.WriteLine($"---Archivo: {archivo} ---Tamaño:{tamanio}");
-    }
-}
+
